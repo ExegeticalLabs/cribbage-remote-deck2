@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0f172a">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Knee Repair Unit</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ═══ BIO-REPAIR THEME ═══ */
+:root{
+  --primary:#0ea5e9; /* Electric Repair Blue */
+  --primary-dim:rgba(14,165,233,0.15);
+  --accent:#38bdf8;
+  --bg:#0b1120; /* Deep Blueprint Slate */
+  --surface:#1e293b;
+  --border:#334155;
+  --text:#e2e8f0;
+  --text-dim:#94a3b8;
+  --success:#22c55e;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'Inter',sans-serif;
+  --sab:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--bg)}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100dvh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;outline:none;-webkit-tap-highlight-color:transparent;cursor:pointer}
+
+/* ═══ LAYOUT ═══ */
+.app{max-width:500px;margin:0 auto;padding:0 16px;padding-bottom:calc(80px + var(--sab))}
+.fade{animation:fadeIn 0.3s ease-out}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ═══ COMPONENTS ═══ */
+.btn{width:100%;padding:16px;border-radius:4px;border:1px solid var(--primary);font-family:var(--mono);font-weight:700;font-size:14px;background:rgba(14,165,233,0.1);color:var(--primary);text-transform:uppercase;letter-spacing:1px;transition:all 0.2s}
+.btn:active{background:var(--primary);color:#fff}
+.btn-main{background:var(--primary);color:#0f172a;box-shadow:0 0 15px rgba(14,165,233,0.4)}
+.btn-back{background:none;border:none;color:var(--text-dim);font-family:var(--mono);font-size:12px;padding:12px 0;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:1px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:20px;margin-bottom:12px;position:relative;overflow:hidden}
+
+/* ═══ TYPOGRAPHY ═══ */
+h1{font-family:var(--mono);font-size:22px;font-weight:700;color:#fff;letter-spacing:-0.5px}
+h2{font-family:var(--mono);font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px}
+.tag{font-family:var(--mono);font-size:10px;color:var(--primary);border:1px solid var(--primary);padding:2px 6px;border-radius:4px;display:inline-block;margin-bottom:8px;text-transform:uppercase}
+.label{font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+
+/* ═══ TECH VISUALS ═══ */
+.tech-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:24px}
+.tech-col{text-align:center;padding:8px 0;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:4px}
+.tech-col.active{border-color:var(--primary);background:var(--primary-dim);box-shadow:0 0 10px rgba(14,165,233,0.1)}
+.tech-col.done{border-color:var(--success);color:var(--success)}
+.tech-day{font-family:var(--mono);font-size:10px;color:var(--text-dim)}
+.tech-dot{width:4px;height:4px;background:#334155;margin:4px auto 0;border-radius:50%}
+.active .tech-dot{background:var(--primary);box-shadow:0 0 4px var(--primary)}
+.done .tech-dot{background:var(--success);box-shadow:0 0 4px var(--success)}
+
+.scan-line{height:2px;width:100%;background:linear-gradient(90deg, transparent, var(--primary), transparent);position:absolute;top:0;left:0;opacity:0.5;animation:scan 3s infinite linear}
+@keyframes scan{0%{transform:translateY(0)}100%{transform:translateY(150px)}}
+
+/* ═══ LOGO SVG ═══ */
+.logo-svg{width:24px;height:24px;stroke:var(--primary);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ═══ WORKOUT UI ═══ */
+.prog-track{height:6px;background:#0f172a;border:1px solid var(--border);border-radius:3px;margin-bottom:24px;overflow:hidden}
+.prog-fill{height:100%;background:var(--primary);box-shadow:0 0 10px var(--primary);transition:width 0.3s ease}
+
+.set-hex{width:64px;height:74px;background:var(--surface);border:2px solid var(--primary);clip-path:polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;color:var(--primary);font-family:var(--mono);font-size:24px;font-weight:700}
+</style>
+</head>
+<body>
+<div id="app" class="app"></div>
+
+<script>
+// ═══ DATA: REPAIR PROTOCOL ═══
+// 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
+const SCHED = ["Rest", "Repair", "Rest", "Repair", "Rest", "Repair", "Rest"];
+const EXERCISES = [
+  {name: "Backward Walking", target: "5 mins", sets: 1, type: "time", dur: 300, desc: "Initiate reverse locomotion. Tibialis activation required."},
+  {name: "Wall Tibialis Raise", target: "20 reps", sets: 1, type: "reps", desc: "Dorsiflexion against vertical surface. Maximize range."},
+  {name: "Wall Calf Raise", target: "20 reps", sets: 1, type: "reps", desc: "Plantar flexion. Hold peak contraction."},
+  {name: "Bent Leg Calf Raise", target: "20 reps", sets: 1, type: "reps", desc: "Soleus focus. Maintain knee flexion."},
+  {name: "Reverse Step Up", target: "25 reps", sets: 2, sides: true, type: "reps", desc: "Eccentric control. Knee alignment critical."},
+  {name: "ATG Split Squat", target: "10 reps", sets: 3, sides: true, type: "reps", desc: "Full range motion. Hamstring to calf contact."},
+  {name: "Elephant Walk", target: "20 reps", sets: 1, sides: true, type: "reps", desc: "Posterior chain mobilization."},
+  {name: "L-Sit Progression", target: "20 reps", sets: 1, type: "reps", desc: "Hip flexor strength test."},
+  {name: "Active Couch Stretch", target: "45 sec", sets: 1, sides: true, type: "time", dur: 45, desc: "Hip extension. Glute activation mandatory."},
+  {name: "Piriformis Push-up", target: "20 reps", sets: 1, sides: true, type: "reps", desc: "External rotation capacity."},
+  {name: "Pancake Pulse", target: "20 reps", sets: 1, type: "reps", desc: "Adductor lengthening. Pulse torso forward."}
+];
+
+const db={g:(k,d)=>JSON.parse(localStorage.getItem("krp_"+k)||JSON.stringify(d)),s:(k,v)=>localStorage.setItem("krp_"+k,JSON.stringify(v))};
+let S={view:"home",sess:db.g("sess",null),hist:db.g("hist",[]),timer:null};
+const app=document.getElementById("app");
+let timerInt=null;function R(){app.innerHTML=S.view==="home"?vHome():S.view==="workout"?vWork():vHist()}
+
+// ═══ VIEWS ═══
+function vHome(){
+  const d=new Date(),day=d.getDay(),type=SCHED[day],done=S.hist.some(h=>new Date(h.date).toDateString()===d.toDateString());
+  // Week Grid
+  let g='<div class="tech-grid">';
+  for(let i=0;i<7;i++){
+    let dt=new Date(d);dt.setDate(d.getDate()-day+i);
+    let isT=i===day,isD=S.hist.some(h=>new Date(h.date).toDateString()===dt.toDateString());
+    g+=`<div class="tech-col ${isT?'active':''} ${isD?'done':''}"><div class="tech-day">${["SU","MO","TU","WE","TH","FR","SA"][i]}</div><div class="tech-dot"></div></div>`
+  }
+  g+='</div>';
+
+  // Status Card
+  let c='';
+  if(S.sess){
+    c=`<div class="card" onclick="S.view='workout';R()"><div class="scan-line"></div><div class="tag">System Active</div><h2>Resume Protocol</h2><div class="label" style="margin-top:8px">Current Task: ${S.sess.exName}</div><button class="btn btn-main" style="margin-top:16px">Continue &rarr;</button></div>`;
+  } else if(type==="Repair" && !done){
+    c=`<div class="card"><div class="tag">Maintenance Required</div><h1>Repair Protocol A</h1><div class="label" style="margin:12px 0;line-height:1.5">Structural reinforcement cycle.<br>11 Modules • Est. Time: 30m</div><button class="btn btn-main" onclick="start()">Initialize Repair</button></div>`;
+  } else if(done){
+    c=`<div class="card" style="text-align:center;border-color:var(--success)"><div style="font-size:32px;color:var(--success);margin-bottom:8px">&#10004;</div><h2>System Optimal</h2><div class="label">Daily maintenance complete.</div></div>`;
+  } else {
+    c=`<div class="card" style="opacity:0.7"><div class="tag" style="border-color:#555;color:#888">Standby Mode</div><h2>Rest & Recovery</h2><div class="label" style="margin:12px 0">System cooling down.</div><button class="btn" onclick="start()">Force Maintenance</button></div>`;
+  }
+
+  return `<div class="fade"><div style="display:flex;justify-content:space-between;align-items:center;margin:20px 0;border-bottom:1px solid var(--border);padding-bottom:16px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <svg class="logo-svg" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      <div><div class="label" style="color:var(--primary);margin:0">Knee Repair Unit</div><div style="font-family:var(--mono);font-size:12px;color:var(--text-dim)">v1.0.4</div></div>
+    </div>
+    <div onclick="S.view='history';R()" style="text-align:right;cursor:pointer"><div class="mono" style="font-size:16px;color:var(--primary)">${S.hist.length}</div><div class="label">Logs</div></div>
+  </div>${g}${c}<div style="margin-top:24px"><button class="btn-back" style="justify-content:center;width:100%" onclick="S.view='history';R()">Access Logs</button></div></div>`
+}
+
+function vWork(){
+  if(!S.sess){S.view="home";R();return}
+  const ex=EXERCISES[S.sess.exIdx],tot=calcTot(),cur=S.sess.step,pct=(cur/tot)*100;
+  let tmr='';
+  if(ex.type==="time"){
+    const rem=S.timer?S.timer.rem:ex.dur;
+    const on=S.timer&&S.timer.active;
+    tmr=`<div style="margin-bottom:20px"><button class="btn ${on?'btn-main':''}" onclick="togTmr(${ex.dur})">${on?'&#9208; HOLD':'&#9654; INITIATE'} ${fmt(rem)}</button></div>`;
+  }
+  return `<div class="fade"><div style="display:flex;justify-content:space-between;padding:16px 0"><button class="btn-back" onclick="cancel()">&#10005; Abort</button><div style="font-family:var(--mono);color:var(--primary)">${Math.round(pct)}%</div></div><div class="prog-track"><div class="prog-fill" style="width:${pct}%"></div></div><div style="text-align:center;padding-top:10px"><div class="set-hex">${S.sess.set}</div><div class="tag">${ex.sides?(S.sess.side===0?"Left Link":"Right Link"):"Standard Link"}</div><h1 style="font-size:24px;margin:8px 0 16px">${ex.name}</h1><div class="label" style="margin-bottom:24px;max-width:300px;margin-left:auto;margin-right:auto">${ex.desc}</div>${tmr}<div style="font-family:var(--mono);color:var(--accent);margin-bottom:32px;font-size:18px">Target: ${ex.target}</div><button class="btn btn-main" onclick="next()">Confirm Completion</button></div></div>`
+}
+
+function vHist(){
+  let items=S.hist.slice(0,100);
+  let h=items.map(i=>`<div style="display:flex;justify-content:space-between;padding:12px;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:12px"><span>${new Date(i.date).toLocaleDateString()}</span><span style="color:var(--success)">COMPLETE</span></div>`).join("");
+  return `<div class="fade"><button class="btn-back" onclick="S.view='home';R()">&#8592; Return</button><h2 style="margin:20px 0">Maintenance Logs</h2><div class="card" style="padding:0">${h||'<div style="padding:20px;text-align:center;color:var(--text-dim)">No data found.</div>'}</div></div>`
+}
+
+// ═══ LOGIC ═══
+function start(){S.sess={start:Date.now(),exIdx:0,set:1,side:0,step:0,exName:EXERCISES[0].name};S.timer=null;db.s("sess",S.sess);S.view="workout";R()}
+function next(){
+  clearTimer();S.timer=null;
+  const ex=EXERCISES[S.sess.exIdx];let fin=false;
+  if(ex.sides){if(S.sess.side===0)S.sess.side=1;else{S.sess.side=0;if(S.sess.set<ex.sets)S.sess.set++;else fin=true}}
+  else{if(S.sess.set<ex.sets)S.sess.set++;else fin=true}
+  S.sess.step++;
+  if(fin){S.sess.exIdx++;S.sess.set=1;S.sess.side=0}
+  if(S.sess.exIdx>=EXERCISES.length)finish();else{S.sess.exName=EXERCISES[S.sess.exIdx].name;db.s("sess",S.sess);R()}
+}
+function finish(){S.hist.unshift({date:new Date().toISOString()});if(S.hist.length>200)S.hist=S.hist.slice(0,200);db.s("hist",S.hist);S.sess=null;db.s("sess",null);S.view="home";R();setTimeout(()=>alert("Maintenance Cycle Complete."),100)}
+function cancel(){if(confirm("Abort Protocol?")){S.sess=null;db.s("sess",null);clearTimer();S.timer=null;S.view="home";R()}}
+function togTmr(d){if(S.timer&&S.timer.active){clearTimer();S.timer.active=false}else{if(!S.timer)S.timer={rem:d,active:true};else S.timer.active=true;beep(600,0.1);timerInt=setInterval(()=>{S.timer.rem--;if(S.timer.rem<=0){clearTimer();beep(800,0.3);S.timer.active=false;S.timer.rem=d}R()},1e3)}R()}
+function clearTimer(){if(timerInt)clearInterval(timerInt);timerInt=null}
+function calcTot(){return EXERCISES.reduce((a,e)=>a+(e.sets*(e.sides?2:1)),0)}
+function fmt(s){return Math.floor(s/60)+":"+(s%60<10?"0":"")+(s%60)}
+let ac=null;function beep(f,d){try{if(!ac)ac=new(window.AudioContext||window.webkitAudioContext);if(ac.state==='suspended')ac.resume();const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;g.gain.value=0.3;o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d)}catch(e){}}
+
+// Init Service Worker
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+R();
+</script>
+</body>
+</html>
